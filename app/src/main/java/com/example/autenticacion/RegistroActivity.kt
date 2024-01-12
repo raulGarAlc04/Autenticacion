@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import com.example.autenticacion.databinding.ActivityRegistroBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class RegistroActivity : AppCompatActivity() {
 
@@ -15,6 +16,8 @@ class RegistroActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityRegistroBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val db = FirebaseFirestore.getInstance()
 
         binding.bRegistrar.setOnClickListener {
             // Comprobamos que ningun campo está vacío
@@ -26,6 +29,12 @@ class RegistroActivity : AppCompatActivity() {
                     binding.password.text.toString()
                 ).addOnCompleteListener {
                     if (it.isSuccessful) {
+                        db.collection("usuarios").document(binding.email.text.toString())
+                            .set(mapOf(
+                                "nombre" to binding.nombre.text.toString(),
+                                "apellidos" to binding.apellidos.text.toString()
+                            ))
+
                         // Si el usuario se ha registrado correctamente, mostramos al activity de bienvenida
                         val intent = Intent(this, InicioActivity::class.java).apply {
                             putExtra("nombreusuario", binding.nombre.text.toString())
